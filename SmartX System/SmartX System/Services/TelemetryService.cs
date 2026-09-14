@@ -4,10 +4,10 @@ namespace SmartX_System.Services
 {
     public class TelemetryService
     {
-        // Advanced Lists to manage historical batches
+    
         private readonly List<TelemetryPacket<object>> _telemetryHistory = new();
 
-        // Simulated nested tree for recursion validation
+       
         private readonly Dictionary<string, Dictionary<string, List<string>>> _facilityTree = new()
         {
             { "Facility A", new Dictionary<string, List<string>>
