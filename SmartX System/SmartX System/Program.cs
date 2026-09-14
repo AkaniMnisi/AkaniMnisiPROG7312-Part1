@@ -20,7 +20,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.MapGet("/api/menu", () => new[] {
     "Sensor Data Ingestion and Telemetry",
