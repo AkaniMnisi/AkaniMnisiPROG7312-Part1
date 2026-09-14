@@ -1,4 +1,4 @@
-﻿using SmartX_System.Models;
+﻿using SmartX.Shared.Models;
 
 namespace SmartX_System.Services
 {

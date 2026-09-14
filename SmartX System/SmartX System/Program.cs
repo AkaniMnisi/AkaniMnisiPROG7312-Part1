@@ -1,4 +1,4 @@
-using SmartX_System.Models;
+using SmartX.Shared.Models;
 using SmartX_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
