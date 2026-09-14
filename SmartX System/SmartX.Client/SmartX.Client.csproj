@@ -13,11 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartX.Shared\SmartX.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Shared\" />
+    <ProjectReference Include="..\SmartX System\SmartX System.csproj" />
   </ItemGroup>
 
 </Project>
