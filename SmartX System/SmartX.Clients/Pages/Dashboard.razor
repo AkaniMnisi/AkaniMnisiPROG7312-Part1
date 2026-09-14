@@ -51,13 +51,13 @@
         </div>
     </div>
 </div>
-
+@using SmartX.Shared.Models
 @code {
-    private List<SmartX_System.Models.TelemetryPacket<object>> packets = new();
+    private List<TelemetryPacket<object>> packets = new();
 
     private async Task SimulateIngestion()
     {
-        var newPacket = new SmartX_System.Models.TelemetryPacket<object>
+        var newPacket = new TelemetryPacket<object>
         {
             SensorId = Guid.NewGuid().ToString().Substring(0, 8),
             MacAddress = "00:1B:44:11:3A:B7",
