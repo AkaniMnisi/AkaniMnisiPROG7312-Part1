@@ -6,7 +6,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// IMPORTANT: Change 5001 to match the port of your API (Check SmartX System/Properties/launchSettings.json)
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:5012 /") });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7210/") });
 
 await builder.Build().RunAsync();
