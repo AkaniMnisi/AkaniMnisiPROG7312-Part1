@@ -1,0 +1,66 @@
+﻿@page "/command-stream"
+@using System.Net.Http.Json
+@using SmartX.Shared.Models
+@inject HttpClient Http
+
+<h2>Real-Time Command Stream</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Live Devices</h4>
+        <input type="text" class="form-control mb-3" placeholder="Search devices..." @bind="searchQuery" @bind:event="oninput" />
+        
+        <ul class="list-group">
+            @foreach (var device in FilteredDevices)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    @device.Key <span class="badge bg-primary rounded-pill">@device.Value</span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-md-6">
+        <h4>Manual Overrides</h4>
+        <button class="btn btn-warning m-2" @onclick='() => TriggerCommandAsync("Turn On Pump A")'>Trigger Pump A</button>
+        <button class="btn btn-danger m-2" @onclick='() => TriggerCommandAsync("Shut Off Main Valve")'>Shut Off Valve</button>
+        <button class="btn btn-secondary m-2" @onclick="UndoCommandAsync">↩ Undo Last Command</button>
+
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <div class="alert alert-info mt-3">@StatusMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    private string searchQuery = "";
+    private string StatusMessage = "";
+    
+    
+    private Dictionary<string, string> LiveDevices = new Dictionary<string, string>
+    {
+        { "ESP32-MAC-001", "Online" },
+        { "ESP32-MAC-002", "Disconnected" },
+        { "ESP32-MAC-003", "Online" }
+    };
+
+    private IEnumerable<KeyValuePair<string, string>> FilteredDevices =>
+        string.IsNullOrWhiteSpace(searchQuery) 
+            ? LiveDevices 
+            : LiveDevices.Where(d => d.Key.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) 
+                                  || d.Value.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+
+    private async Task TriggerCommandAsync(string commandName)
+    {
+        
+        var response = await Http.PostAsJsonAsync("https://localhost:7000/api/telemetry/command", new ManualCommand { CommandName = commandName });
+        if (response.IsSuccessStatusCode) StatusMessage = $"Command Sent: {commandName}";
+    }
+
+    private async Task UndoCommandAsync()
+    {
+        var response = await Http.PostAsync("https://localhost:7000/api/telemetry/undo", null);
+        if (response.IsSuccessStatusCode) StatusMessage = await response.Content.ReadAsStringAsync();
+    }
+}

@@ -1,13 +1,11 @@
-﻿using SmartX.Shared.Models;
+﻿using SmartX.Shared; 
 
-namespace SmartX_System.Services
+namespace SmartX.System.Services 
 {
     public class TelemetryService
     {
-    
         private readonly List<TelemetryPacket<object>> _telemetryHistory = new();
 
-       
         private readonly Dictionary<string, Dictionary<string, List<string>>> _facilityTree = new()
         {
             { "Facility A", new Dictionary<string, List<string>>
@@ -19,7 +17,6 @@ namespace SmartX_System.Services
 
         public void ProcessPacket(TelemetryPacket<object> packet)
         {
-            
             if (ValidateLocationRecursive("Facility A", packet.Location))
             {
                 _telemetryHistory.Add(packet);
@@ -30,7 +27,6 @@ namespace SmartX_System.Services
             }
         }
 
-       
         private bool ValidateLocationRecursive(string currentNode, string targetLocation)
         {
             if (currentNode == targetLocation) return true;
