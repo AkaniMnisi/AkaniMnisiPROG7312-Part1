@@ -1,8 +1,15 @@
-﻿@inherits LayoutComponentBase
+﻿<div class="page">
+    <div class="sidebar">
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/">Part 1: Ingestion</a>
+            <a class="nav-link" href="/command-stream">Part 2: Real-Time Command Stream</a>
+            <a class="nav-link" href="/topology">Network Topology</a>
+        </nav>
+    </div>
 
-
-<div class="page">
-    <main>
-        @Body
-    </main>
+    <div class="main">
+        <article class="content px-4">
+            @Body
+        </article>
+    </div>
 </div>
