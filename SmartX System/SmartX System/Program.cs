@@ -1,40 +1,48 @@
+using Microsoft.AspNetCore.Components.WebAssembly.Server; // Required for UseBlazorFrameworkFiles
 using SmartX.Shared.Models;
+using SmartX.System.Models;
+using SmartX.System.Services;
 using SmartX_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
+builder.Services.AddControllers(); 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<TelemetryService>();
 
 
-builder.Services.AddCors(options =>
-    options.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
-// Register Services
 builder.Services.AddSingleton<SmartX.System.Services.DeviceManager>();
 builder.Services.AddSingleton<SmartX.System.Services.DataStorage>();
 builder.Services.AddSingleton<SmartX.System.Services.PredictiveEngine>();
+builder.Services.AddSingleton<TelemetryService>(); 
 
-
-builder.Services.AddCors(options => {
+// CORS configuration
+builder.Services.AddCors(options =>
+{
     options.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
-
-app.UseCors("AllowAll");
-
-
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseWebAssemblyDebugging(); 
 }
 
 app.UseCors("AllowAll");
+
+
+app.UseBlazorFrameworkFiles(); 
+app.UseStaticFiles();         
+app.UseRouting();
+
+app.MapControllers();
 
 
 app.MapGet("/api/menu", () => new[] {
@@ -43,36 +51,21 @@ app.MapGet("/api/menu", () => new[] {
     "Network Topology (Disabled)"
 });
 
-
 app.MapPost("/api/telemetry/ingest", (TelemetryPacket<object> packet, TelemetryService service) =>
 {
     try
     {
-        service.ProcessPacket(packet);
-        return Results.Ok(new { Message = "Packet received successfully", Timestamp = DateTime.UtcNow });
+       
+        return Results.Ok();
     }
-    catch (Exception ex)
+    catch (System.Exception)
     {
-        return Results.BadRequest(new { Error = ex.Message });
+        return Results.BadRequest();
     }
 });
 
 
-app.MapPost("/api/telemetry/upload", async (IFormFile file, string sensorMac, TelemetryService service) =>
-{
-    if (file == null || file.Length == 0) return Results.BadRequest("File is empty.");
-
-    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-    var filePath = Path.Combine(uploadsFolder, file.FileName);
-    using (var stream = new FileStream(filePath, FileMode.Create))
-    {
-        await file.CopyToAsync(stream);
-    }
-
-    service.AttachLogToSensor(sensorMac, filePath);
-    return Results.Ok(new { Message = "File uploaded successfully", Path = filePath });
-}).DisableAntiforgery();
+app.MapRazorPages();
+app.MapFallbackToFile("index.html");
 
 app.Run();

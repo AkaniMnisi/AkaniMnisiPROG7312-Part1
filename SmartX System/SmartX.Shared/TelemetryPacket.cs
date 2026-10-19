@@ -1,4 +1,4 @@
-﻿namespace SmartX.Shared.Models
+﻿namespace SmartX.System.Models
 {
     public class TelemetryPacket<T>
     {
