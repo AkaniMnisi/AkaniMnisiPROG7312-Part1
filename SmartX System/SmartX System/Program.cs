@@ -3,6 +3,8 @@ using SmartX_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<TelemetryService>();
@@ -10,8 +12,21 @@ builder.Services.AddSingleton<TelemetryService>();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+// Register Services
+builder.Services.AddSingleton<SmartX.System.Services.DeviceManager>();
+builder.Services.AddSingleton<SmartX.System.Services.DataStorage>();
+builder.Services.AddSingleton<SmartX.System.Services.PredictiveEngine>();
+
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 var app = builder.Build();
+
+
+app.UseCors("AllowAll");
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -20,7 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
-//app.UseHttpsRedirection();
+
 
 app.MapGet("/api/menu", () => new[] {
     "Sensor Data Ingestion and Telemetry",
