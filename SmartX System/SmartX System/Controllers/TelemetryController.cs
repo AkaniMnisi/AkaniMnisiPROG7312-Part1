@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SmartX.Shared; 
 using SmartX.Shared.Models;
 using SmartX.System.Services;
 
@@ -20,15 +21,13 @@ namespace SmartX.System.Controllers
         }
 
         [HttpPost("ingest")]
-        public IActionResult IngestData([FromBody] TelemetryData data)
+        public IActionResult IngestData([FromBody] TelemetryPacket<object> packet)
         {
-            _deviceManager.RouteIncomingData(data);
-            _dataStorage.LogEvent(data.DeviceMacAddress, $"Value: {data.Value}");
+            
+            var macAddress = packet?.MacAddress;
 
-            if (data.Value == -1) _dataStorage.TriggerDisconnectAlert(data.DeviceMacAddress);
 
-            var insight = _predictiveEngine.GenerateRecommendation(data.Value, data.DeviceMacAddress);
-            return Ok(new { Message = "Data Ingested", Insight = insight });
+            return Ok(new { Message = "Data Ingested", Mac = macAddress });
         }
 
         [HttpPost("command")]

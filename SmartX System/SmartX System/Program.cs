@@ -1,20 +1,18 @@
-using Microsoft.AspNetCore.Components.WebAssembly.Server; // Required for UseBlazorFrameworkFiles
-using SmartX.Shared.Models;
-using SmartX.System.Models;
-using SmartX.System.Services;
-using SmartX_System.Services;
+using Microsoft.AspNetCore.Components.WebAssembly.Server;
+using SmartX.Shared;
+using SmartX.System.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(); 
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-builder.Services.AddSingleton<SmartX.System.Services.DeviceManager>();
-builder.Services.AddSingleton<SmartX.System.Services.DataStorage>();
-builder.Services.AddSingleton<SmartX.System.Services.PredictiveEngine>();
-builder.Services.AddSingleton<TelemetryService>(); 
+// Services
+builder.Services.AddSingleton<DeviceManager>();
+builder.Services.AddSingleton<DataStorage>();
+builder.Services.AddSingleton<PredictiveEngine>();
+builder.Services.AddSingleton<TelemetryService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>
@@ -22,28 +20,23 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
-
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseWebAssemblyDebugging(); 
+    app.UseWebAssemblyDebugging();
 }
 
 app.UseCors("AllowAll");
-
-
-app.UseBlazorFrameworkFiles(); 
-app.UseStaticFiles();         
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.MapControllers();
-
 
 app.MapGet("/api/menu", () => new[] {
     "Sensor Data Ingestion and Telemetry",
@@ -55,7 +48,8 @@ app.MapPost("/api/telemetry/ingest", (TelemetryPacket<object> packet, TelemetryS
 {
     try
     {
-       
+        
+        service.ProcessPacket(packet);
         return Results.Ok();
     }
     catch (System.Exception)
@@ -63,7 +57,6 @@ app.MapPost("/api/telemetry/ingest", (TelemetryPacket<object> packet, TelemetryS
         return Results.BadRequest();
     }
 });
-
 
 app.MapRazorPages();
 app.MapFallbackToFile("index.html");
